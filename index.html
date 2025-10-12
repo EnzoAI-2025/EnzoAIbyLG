@@ -3,771 +3,156 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EnzoIA v3.0 — Assistente Inteligente</title>
-
-  <!-- Favicon (generic) -->
-  <link rel="icon" href="logo.png" type="image/png">
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- TailwindCSS CDN (play-safe, latest) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Tailwind config override for extended colors & fonts -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            neon: {
-              cyan: '#06b6d4',
-              purple: '#8b5cf6',
-              darkglass: 'rgba(255,255,255,0.03)'
-            },
-            enzo: {
-              bg1: '#030617',
-              bg2: '#041021',
-              glass: 'rgba(255,255,255,0.02)'
-            }
-          },
-          fontFamily: {
-            inter: ['Inter', 'sans-serif'],
-            orbitron: ['Orbitron', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
+  <title>Enzo.AI — Mini Inteligência Artificial</title>
   <style>
-    /* Additional custom styles for glassmorphism + animations */
-    :root {
-      --accent-cyan: #06b6d4;
-      --accent-purple: #8b5cf6;
-      --glass: rgba(255,255,255,0.03);
-      --muted: #94a3b8;
+    :root{
+      --bg:#0f1724;--card:#0b1220;--accent:#10b981;--muted:#94a3b8;--glass:rgba(255,255,255,0.03);
     }
-
-    body {
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(11,14,23,0.6), transparent),
-                  radial-gradient(1000px 500px at 90% 90%, rgba(39,12,74,0.45), transparent),
-                  linear-gradient(180deg,#030617 0%, #041021 60%, #000 100%);
-      color: #e6eef6;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      min-height:100vh;
-    }
-
-    /* Container */
-    .container {
-      max-width:1100px;
-      margin:36px auto;
-      padding:20px;
-    }
-
-    /* Card */
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:14px;
-      backdrop-filter: blur(8px) saturate(120%);
-      border: 1px solid rgba(255,255,255,0.04);
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
-      overflow: hidden;
-    }
-
-    /* Logo animation */
-    .logo-wrap {
-      width:84px;height:84px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-      background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      box-shadow: 0 0 22px rgba(6,182,212,0.08), inset 0 1px 0 rgba(255,255,255,0.02);
-      transition: transform .6s cubic-bezier(.2,.9,.2,1);
-      transform-origin:center;
-      animation: float 6s ease-in-out infinite;
-    }
-    .logo-wrap img { width:76px; height:76px; object-fit:contain; filter: drop-shadow(0 6px 18px rgba(6,182,212,0.12)); }
-    @keyframes float { 0% { transform: translateY(0);} 50%{ transform: translateY(-6px);} 100%{ transform: translateY(0);} }
-
-    /* Chat */
-    .chat-window {
-      height:64vh;
-      min-height:360px;
-      max-height:78vh;
-      overflow:auto;
-      padding:18px;
-    }
-
-    /* Message bubbles */
-    .msg { max-width:80%; padding:12px 14px; border-radius:12px; margin-bottom:12px; position:relative; }
-    .msg.user { margin-left:auto; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); color: #e6eef6; }
-    .msg.assistant { background: linear-gradient(180deg, rgba(6,182,212,0.06), rgba(139,92,246,0.02)); border:1px solid rgba(6,182,212,0.14); box-shadow: 0 6px 20px rgba(6,182,212,0.03); color:#eaf7ff; }
-    .msg .meta { font-size:11px; color:var(--muted); margin-bottom:8px; font-weight:600; display:flex; gap:8px; align-items:center; }
-    .msg .text { white-space:pre-wrap; word-wrap:break-word; line-height:1.45; font-size:15px; }
-
-    /* typing pulse */
-    .typing-dots span { display:inline-block; width:6px; height:6px; margin:0 2px; border-radius:50%; background:var(--accent-cyan); opacity:.9; animation: blink 1s infinite; }
-    .typing-dots span:nth-child(2){ animation-delay: .15s } .typing-dots span:nth-child(3){ animation-delay: .3s }
-    @keyframes blink { 0% { transform: translateY(0); opacity: .2 } 50% { transform: translateY(-4px); opacity: 1 } 100% { transform: translateY(0); opacity: .2 } }
-
-    /* Sidebar */
-    .sidebar { background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.01)); border-left:1px solid rgba(255,255,255,0.02); min-width:260px; max-width:330px; padding:12px; }
-
-    /* Theme toggle */
-    .toggle { cursor:pointer; padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); background:transparent }
-
-    /* Neon border for buttons */
-    .neon-btn { border:1px solid rgba(6,182,212,0.12); background:linear-gradient(90deg, rgba(6,182,212,0.03), rgba(139,92,246,0.02)); transition:all .18s ease; }
-    .neon-btn:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(6,182,212,0.06), 0 0 30px rgba(139,92,246,0.03); }
-
-    /* Scrollbar */
-    .chat-window::-webkit-scrollbar { width:10px; }
-    .chat-window::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#06202b,#04121a); border-radius:999px; border:1px solid rgba(255,255,255,0.02); }
-
-    /* Responsive tweaks */
-    @media (max-width: 900px) {
-      .sidebar { display:none; }
-      .chat-window { height:56vh; min-height:320px; }
-    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{margin:0;background:linear-gradient(180deg,#071026 0%,#041421 100%);color:#e6eef6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;transition:background .3s ease,color .3s ease}
+    body.light{background:linear-gradient(180deg,#f0f4f8 0%,#d9e2ec 100%);color:#1e293b}
+    .app{width:100%;max-width:940px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    header{display:flex;gap:12px;align-items:center}
+    .logo{width:80px;height:80px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:#fff;letter-spacing:-1px;text-shadow:0 0 12px rgba(16,185,129,0.6);box-shadow:0 0 15px rgba(16,185,129,0.15);overflow:hidden}
+    .logo img{width:100%;height:100%;object-fit:cover}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:4px 0 12px;color:var(--muted);font-size:13px}
+    .chat{background:var(--card);border-radius:12px;padding:14px;min-height:320px;max-height:60vh;overflow:auto}
+    body.light .chat{background:#fff}
+    .msg{padding:10px 12px;margin-bottom:8px;border-radius:10px;max-width:78%}
+    .user{background:linear-gradient(90deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));margin-left:auto;border-top-right-radius:2px}
+    .bot{background:var(--glass);border:1px solid rgba(255,255,255,0.03)}
+    .meta{font-size:11px;color:var(--muted);margin-bottom:6px}
+    .controls{display:flex;gap:8px;margin-top:12px}
+    input[type=text]{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
+    button{padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:#072018;font-weight:600;cursor:pointer;transition:opacity .2s ease}
+    button:hover{opacity:0.85}
+    .small{font-size:12px;color:var(--muted)}
+    .suggestions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .chip{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:999px;cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .actions button{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:6px 10px;border-radius:8px}
+    .typing{display:inline-block;height:8px;width:36px}
+    .result-source{font-size:11px;color:var(--muted);margin-top:6px}
+    @media (max-width:820px){.app{padding:12px}.logo{width:60px;height:60px}}
   </style>
 </head>
-<body class="antialiased">
-
-  <div class="container">
-    <!-- Top header: logo centered + title + small controls -->
-    <header class="card p-4 mb-6 flex items-center gap-4">
-      <div class="flex items-center gap-4 w-full">
-        <div class="logo-wrap" title="EnzoIA Logo" id="logoWrap" aria-hidden="true">
-          <img src="logo.png" alt="EnzoIA Logo" id="logoImg">
-        </div>
-        <div class="flex-1">
-          <h1 class="text-2xl font-extrabold tracking-tight" style="font-family: 'Orbitron', sans-serif">EnzoIA <span class="text-sm ml-2 font-medium" style="font-family: Inter;">v3.0</span></h1>
-          <p class="text-sm text-gray-300 mt-1">Assistente local modular • Privacidade por design • Extensível com OpenAI / SERPAPI</p>
-        </div>
-
-        <!-- Quick controls -->
-        <div class="flex items-center gap-2">
-          <button id="btnKeys" class="px-3 py-2 neon-btn rounded-md text-sm">Configurar chaves</button>
-          <button id="themeToggle" class="px-3 py-2 toggle rounded-md text-sm" title="Alternar tema">Tema</button>
-        </div>
+<body>
+  <main class="app" role="main">
+    <header>
+      <div class="logo" id="logoWrap">
+        <img src="/mnt/data/a971b6f1-c742-48dd-95f0-38eb4e1f535d.png" alt="EnzoIA Logo">
       </div>
+      <div style="flex:1">
+        <h1>Enzo.AI — sua mini IA local</h1>
+        <p class="lead">Interface futurista com voz, tema, busca integrada e respostas inteligentes.</p>
+      </div>
+      <button id="theme">Tema</button>
     </header>
 
-    <!-- Main grid: chat + sidebar -->
-    <main class="card grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 p-4">
-      <!-- Chat area -->
-      <section class="flex flex-col">
-        <!-- Chat window -->
-        <div id="chatWindow" class="chat-window overflow-auto rounded-lg" role="log" aria-live="polite" aria-atomic="false">
-          <!-- Messages inserted here -->
-        </div>
+    <section class="chat" id="chat" aria-live="polite"></section>
 
-        <!-- Composer -->
-        <div class="mt-4 bg-[rgba(255,255,255,0.012)] p-3 rounded-lg border border-[rgba(255,255,255,0.03)]">
-          <div class="flex gap-2 items-center">
-            <button id="micBtn" class="px-3 py-2 neon-btn rounded-md" title="Ativar microfone">🎤</button>
-            <input id="inputText" aria-label="Mensagem para EnzoIA" type="text" class="flex-1 bg-transparent outline-none text-sm p-2" placeholder="Pergunte algo (ex: Pesquise: clima em São Paulo)">
-            <button id="sendBtn" class="ml-2 px-4 py-2 rounded-md neon-btn">Enviar</button>
-            <button id="clearBtn" class="ml-2 px-3 py-2 rounded-md toggle" title="Limpar conversa">Limpar</button>
-          </div>
+    <div class="suggestions" id="sugs">
+      <div class="chip">Olá</div>
+      <div class="chip">Pesquisar: Dom Pedro I</div>
+      <div class="chip">Que dia é hoje?</div>
+      <div class="chip">Conte uma piada</div>
+    </div>
 
-          <div class="flex items-center justify-between mt-3 gap-3">
-            <div class="flex items-center gap-2 text-sm text-gray-300">
-              <span class="text-xs">Temperatura</span>
-              <input id="tempSlider" type="range" min="0" max="1.5" step="0.1" value="0.7" class="h-1">
-              <span id="tempVal" class="w-10 text-right">0.7</span>
-              <label class="ml-4 flex items-center gap-2"><input id="privateMode" type="checkbox"> Modo privado</label>
-            </div>
+    <div class="controls">
+      <input id="input" type="text" placeholder="Digite sua mensagem..." />
+      <button id="send">Enviar</button>
+      <button id="voice">🎙</button>
+      <button id="export">Exportar</button>
+    </div>
 
-            <div class="flex items-center gap-2">
-              <select id="persona" class="rounded-md p-2 bg-[rgba(255,255,255,0.01)] border border-[rgba(255,255,255,0.03)] text-sm">
-                <option value="neutro">Neutro</option>
-                <option value="tecnico">Técnico</option>
-                <option value="criativo">Criativo</option>
-                <option value="divertido">Divertido</option>
-              </select>
-
-              <button id="exportBtn" class="px-3 py-2 rounded-md neon-btn">Exportar</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Sidebar: history + settings + quick actions -->
-      <aside class="sidebar">
-        <h3 class="text-sm font-semibold mb-3">Histórico & Configurações</h3>
-
-        <div id="historyList" class="space-y-2 max-h-[45vh] overflow-auto mb-3">
-          <!-- history entries -->
-        </div>
-
-        <div class="flex gap-2">
-          <button id="loadExample" class="flex-1 px-3 py-2 rounded-md neon-btn text-sm">Exemplo</button>
-          <button id="deleteHistory" class="px-3 py-2 rounded-md toggle text-sm">Apagar</button>
-        </div>
-
-        <hr class="my-3 border-[rgba(255,255,255,0.03)">
-
-        <div>
-          <h4 class="text-xs font-semibold text-gray-300 mb-2">Integrações (opcionais)</h4>
-          <p class="text-xs text-gray-400">Nenhuma chave configurada por padrão. Sem chaves = sem envio de dados externos.</p>
-
-          <div class="mt-2 space-y-2 text-xs">
-            <div class="flex items-center gap-2">
-              <button id="openAISet" class="px-2 py-1 rounded-md neon-btn text-xs">OpenAI</button>
-              <span id="openAIStatus" class="text-[10px] text-gray-300">—</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <button id="serpSet" class="px-2 py-1 rounded-md neon-btn text-xs">SERPAPI</button>
-              <span id="serpStatus" class="text-[10px] text-gray-300">—</span>
-            </div>
-          </div>
-        </div>
-
-        <hr class="my-3 border-[rgba(255,255,255,0.03)">
-
-        <div class="text-xs text-gray-400">
-          <p><strong>Privacidade:</strong> O histórico é salvo localmente. Ative <em>Modo privado</em> para evitar persistência.</p>
-          <p class="mt-2">Feedback por mensagem: 👍 👎</p>
-        </div>
-      </aside>
-    </main>
-
-    <!-- Footer -->
-    <footer class="mt-4 text-center text-sm text-gray-400">
-      EnzoIA © 2025 — Powered by OpenAI & GPT-5
+    <footer>
+      <div class="small">Enzo.AI — Web Speech + OpenAI + SerpAPI</div>
+      <div class="actions"><button id="clear">Limpar</button></div>
     </footer>
-  </div>
+  </main>
 
-  <!-- Inline JavaScript: modular and commented -->
   <script>
-    /* EnzoIA v3.0 Frontend
-       - Single-file distribution for GitHub Pages
-       - Modular JS functions below
-       - Security: no requests made to external APIs unless API keys are set in localStorage
-       - Author: Luiz Gustavo Nascimento
-    */
+    // 🔑 CONFIGURAÇÃO DAS SUAS CHAVES DIRETO NO CÓDIGO
+    const OPENAI_API_KEY = "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";
+    const SERPAPI_KEY = "d2db2d7515693bbc987e8b2bd143a815d76e0a8dd59c9f5c40aed1aff93986d1";
 
-    (function () {
-      // -------------------------
-      // UI references
-      // -------------------------
-      const chatWindow = document.getElementById('chatWindow');
-      const inputText = document.getElementById('inputText');
-      const sendBtn = document.getElementById('sendBtn');
-      const micBtn = document.getElementById('micBtn');
-      const tempSlider = document.getElementById('tempSlider');
-      const tempVal = document.getElementById('tempVal');
-      const personaSelect = document.getElementById('persona');
-      const exportBtn = document.getElementById('exportBtn');
-      const clearBtn = document.getElementById('clearBtn');
-      const historyList = document.getElementById('historyList');
-      const deleteHistory = document.getElementById('deleteHistory');
-      const loadExample = document.getElementById('loadExample');
-      const btnKeys = document.getElementById('btnKeys');
-      const openAIStatus = document.getElementById('openAIStatus');
-      const serpStatus = document.getElementById('serpStatus');
-      const privateModeCheckbox = document.getElementById('privateMode');
-      const themeToggle = document.getElementById('themeToggle');
+    // Elementos principais
+    const chatEl = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+    const clearBtn = document.getElementById("clear");
+    const exportBtn = document.getElementById("export");
+    const themeBtn = document.getElementById("theme");
+    const voiceBtn = document.getElementById("voice");
 
-      // Config keys names
-      const LS_KEYS = {
-        HISTORY: 'enzoia_history_v3',
-        CONFIG: 'enzoia_config_v3',
-        OPENAI_KEY: 'enzoia_openai_key',
-        SERP_KEY: 'enzoia_serp_key'
-      };
-
-      // -------------------------
-      // State
-      // -------------------------
-      let state = {
-        history: [], // {id, role, text, ts, feedback}
-        config: {
-          temperature: parseFloat(tempSlider.value),
-          persona: personaSelect.value,
-          privateMode: false,
-          theme: 'dark'
-        },
-        streaming: false
-      };
-
-      // -------------------------
-      // Utilities
-      // -------------------------
-      function uid(prefix = '') {
-        return prefix + Math.random().toString(36).slice(2,9);
-      }
-      function nowTs() {
-        return new Date().toISOString();
-      }
-      function formatTs(iso) {
-        try { return new Date(iso).toLocaleString('pt-BR'); } catch(e){ return iso; }
-      }
-
-      // Escape HTML for output safety
-      function escapeHtml(text = '') {
-        return text.replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m] || m));
-      }
-
-      // -------------------------
-      // Persistence: localStorage
-      // -------------------------
-      function loadFromStorage() {
-        const raw = localStorage.getItem(LS_KEYS.HISTORY);
-        const rawCfg = localStorage.getItem(LS_KEYS.CONFIG);
-        if (raw && !state.config.privateMode) {
-          try { state.history = JSON.parse(raw) || []; } catch(e){ state.history = []; }
-        }
-        if (rawCfg) {
-          try {
-            const cfg = JSON.parse(rawCfg);
-            state.config = Object.assign(state.config, cfg);
-            tempSlider.value = state.config.temperature;
-            tempVal.textContent = state.config.temperature;
-            personaSelect.value = state.config.persona;
-            privateModeCheckbox.checked = !!state.config.privateMode;
-            if (state.config.theme === 'light') document.body.classList.add('light');
-          } catch(e){}
-        }
-      }
-
-      function saveToStorage() {
-        if (state.config.privateMode) return; // don't persist while in private mode
-        localStorage.setItem(LS_KEYS.HISTORY, JSON.stringify(state.history));
-        localStorage.setItem(LS_KEYS.CONFIG, JSON.stringify(state.config));
-      }
-
-      // -------------------------
-      // Rendering
-      // -------------------------
-      function renderChat() {
-        chatWindow.innerHTML = '';
-        state.history.forEach(msg => {
-          const el = renderMessage(msg);
-          chatWindow.appendChild(el);
-        });
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-      }
-
-      function renderMessage(msg) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'msg ' + (msg.role === 'user' ? 'user' : 'assistant');
-        wrapper.setAttribute('data-id', msg.id);
-
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        meta.innerHTML = `<span style="font-weight:700">${msg.role === 'user' ? 'Você' : 'EnzoIA'}</span><span class="text-xs" style="color:var(--muted)">${formatTs(msg.ts)}</span>`;
-        wrapper.appendChild(meta);
-
-        const body = document.createElement('div');
-        body.className = 'text';
-        body.innerHTML = escapeHtml(msg.text);
-        wrapper.appendChild(body);
-
-        // feedback controls
-        const fb = document.createElement('div');
-        fb.className = 'mt-2 flex items-center gap-2';
-        fb.innerHTML = `
-          <button class="feedback-btn" data-id="${msg.id}" data-val="up">👍</button>
-          <button class="feedback-btn" data-id="${msg.id}" data-val="down">👎</button>
-          <span class="text-xs text-gray-300 ml-2">Feedback</span>
-        `;
-        wrapper.appendChild(fb);
-
-        // attach listeners for feedback
-        fb.querySelectorAll('.feedback-btn').forEach(b => {
-          b.addEventListener('click', (ev) => {
-            const id = b.dataset.id;
-            const val = b.dataset.val;
-            const m = state.history.find(h => h.id === id);
-            if (m) { m.feedback = val; saveToStorage(); b.style.opacity = '0.6'; }
-          });
-        });
-
-        return wrapper;
-      }
-
-      function renderHistoryList() {
-        historyList.innerHTML = '';
-        const items = state.history.slice().reverse();
-        if (!items.length) {
-          historyList.innerHTML = '<div class="text-xs text-gray-400">Nenhuma conversa. Use o botão "Exemplo" para começar.</div>';
-          return;
-        }
-        items.slice(0, 30).forEach(h => {
-          const el = document.createElement('button');
-          el.className = 'w-full text-left text-sm p-2 rounded-md hover:bg-[rgba(255,255,255,0.01)]';
-          el.textContent = `${h.role === 'user' ? 'Você' : 'Enzo'} — ${formatTs(h.ts)}`;
-          el.title = h.text.slice(0,200);
-          el.addEventListener('click', () => {
-            // Scroll to message
-            const msgEl = chatWindow.querySelector(`[data-id="${h.id}"]`);
-            if (msgEl) { msgEl.scrollIntoView({behavior:'smooth', block:'center'}); msgEl.classList.add('ring-2','ring-cyan-400'); setTimeout(()=>msgEl.classList.remove('ring-2','ring-cyan-400'),1400); }
-          });
-          historyList.appendChild(el);
-        });
-      }
-
-      // -------------------------
-      // Message creation helpers
-      // -------------------------
-      function pushMessage(role, text) {
-        const m = { id: uid('m_'), role, text, ts: nowTs(), feedback: null };
-        state.history.push(m);
-        if (!state.config.privateMode) saveToStorage();
-        renderChat();
-        renderHistoryList();
-        return m;
-      }
-
-      // -------------------------
-      // Typing simulation (streaming)
-      // -------------------------
-      function streamAssistantResponse(fullText, onChunk) {
-        // Simulate streaming by emitting small chunks over time
-        // onChunk => function (accumulatedText, finished)
-        let i = 0;
-        const speed = Math.max(6, 18 - Math.round(state.config.temperature * 8)); // adjust pseudo-speed by temperature
-        const acc = { text: '' };
-        state.streaming = true;
-        return new Promise(resolve => {
-          const interval = setInterval(() => {
-            const take = Math.max(1, Math.floor(Math.random() * 6)); // random chunk size
-            acc.text += fullText.slice(i, i + take);
-            i += take;
-            onChunk(acc.text, i >= fullText.length);
-            if (i >= fullText.length) {
-              clearInterval(interval);
-              state.streaming = false;
-              resolve(acc.text);
-            }
-          }, speed);
-        });
-      }
-
-      // -------------------------
-      // Integrations (placeholders & safe guards)
-      // Each integration is modular and only executes when keys are set.
-      // -------------------------
-
-      /* OpenAI/GPT-5 call placeholder
-         - If user stores a key in localStorage under LS_KEYS.OPENAI_KEY, this function will attempt to call it.
-         - IMPORTANT: This code is only a placeholder. Uncomment and adapt for real usage with server-side proxies or secure key handling.
-      */
-      async function callOpenAI(prompt, opts = {}) {
-        const key = localStorage.getItem(LS_KEYS.OPENAI_KEY);
-        if (!key) {
-          throw new Error('OpenAI key not configured');
-        }
-        // SECURITY NOTE:
-        // Do NOT embed secret keys in public client-side code for production.
-        // Best practice: send prompt to your backend and let server call OpenAI (keys never exposed).
-        //
-        // Example structure (commented):
-        // const body = {
-        //   model: 'gpt-5-mini', messages: [{role:'system',content:opts.system||''}, {role:'user',content:prompt}],
-        //   temperature: state.config.temperature
-        // };
-        // const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        //   method:'POST', headers:{ 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-        // });
-        // const j = await res.json();
-        // return j.choices?.[0]?.message?.content || '';
-
-        // For this v3.0 static page we simulate remote behavior.
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            // Faux response using persona
-            resolve(`[OpenAI simulado • persona=${state.config.persona}] Resposta gerada para: "${prompt.slice(0,120)}"`);
-          }, 600);
-        });
-      }
-
-      /* SERPAPI placeholder */
-      async function callSerpAPI(query) {
-        const key = localStorage.getItem(LS_KEYS.SERP_KEY);
-        if (!key) throw new Error('SERPAPI key not configured');
-        // Real call would be:
-        // const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(query)}&api_key=${key}`;
-        // const r = await fetch(url);
-        // return await r.json();
-        return new Promise((resolve) => {
-          setTimeout(()=> resolve({ snippet: `Resumo simulado (SERP) para: ${query}` }), 400);
-        });
-      }
-
-      /* Offline fallback module
-         - For when no API keys are available.
-         - Provide safe canned responses & heuristics.
-       */
-      function offlineFallback(prompt) {
-        // Simple heuristics for common intents (search, date, joke)
-        if (/que dia é hoje|que dia.*hoje/i.test(prompt)) {
-          return `Hoje é ${new Date().toLocaleDateString('pt-BR', { weekday: 'long', year:'numeric', month:'long', day:'numeric' })}.`;
-        }
-        if (/piada|conte uma piada/i.test(prompt)) {
-          return 'Por que o desenvolvedor levou o computador para a aula? Porque queria aprender a compilar conhecimento. 😄';
-        }
-        if (/pesquis|buscar|quem foi|o que é/i.test(prompt)) {
-          return 'Sem acesso à internet. Ative sua SERPAPI para buscas ao vivo ou use uma fonte externa.';
-        }
-        // fallback generic
-        return 'Não consigo acessar APIs externas (chaves não configuradas). Ative OpenAI em "Configurar chaves" para respostas avançadas.';
-      }
-
-      // -------------------------
-      // High-level reply orchestrator
-      // -------------------------
-      async function generateReply(userText) {
-        // Push user message
-        pushMessage('user', userText);
-
-        // Create assistant placeholder message and render initial typing
-        const assistantMsg = pushMessage('assistant', ''); // will be filled
-        const assistantEl = chatWindow.querySelector(`[data-id="${assistantMsg.id}"]`);
-        const bodyEl = assistantEl.querySelector('.text');
-
-        // show typing indicator while we prepare the answer
-        const typingWrapper = document.createElement('div');
-        typingWrapper.className = 'typing-dots';
-        typingWrapper.innerHTML = '<span></span><span></span><span></span>';
-        bodyEl.innerHTML = '';
-        bodyEl.appendChild(typingWrapper);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-
-        // Decide strategy:
-        // 1) If user intent is "pesquisar" and SERP key exists -> call SERP
-        // 2) Else if OpenAI key exists -> callOpenAI
-        // 3) Else -> offlineFallback
-        let finalText = '';
-        const isSearch = /\b(pesquis[ea]|pesquise|pesquisar|buscar|procure|pesquisa|quem foi|o que é)\b/i.test(userText);
-
-        try {
-          if (isSearch && localStorage.getItem(LS_KEYS.SERP_KEY)) {
-            const serp = await callSerpAPI(userText);
-            finalText = serp.snippet || JSON.stringify(serp).slice(0,800);
-          } else if (localStorage.getItem(LS_KEYS.OPENAI_KEY)) {
-            const systemPersona = {
-              neutro: 'Você é EnzoIA — assistente neutro, claro e objetivo. Responda em português.',
-              tecnico: 'Você é EnzoIA — persona técnica. Forneça respostas detalhadas, com exemplos e linguagem precisa.',
-              criativo: 'Você é EnzoIA — persona criativa. Responda de forma imaginativa e envolvente.',
-              divertido: 'Você é EnzoIA — persona divertida. Use humor leve e analogias.'
-            }[state.config.persona] || '';
-            const prompt = `${userText}\n\nPersona: ${state.config.persona}\nTemperatura: ${state.config.temperature}`;
-            // try openAI
-            finalText = await callOpenAI(prompt, { system: systemPersona });
-          } else {
-            // offline fallback
-            finalText = offlineFallback(userText);
-          }
-        } catch (err) {
-          finalText = `Erro ao gerar resposta: ${err.message || String(err)}.`;
-        }
-
-        // Stream the finalText into the message element
-        await streamAssistantResponse(finalText, (accumText, finished) => {
-          // update UI per chunk
-          bodyEl.innerHTML = `<div>${escapeHtml(accumText)}</div>`;
-          if (finished) {
-            // append source/timestamp metadata (already rendered in meta)
-            // finalize message's text content in storage
-            const stored = state.history.find(h => h.id === assistantMsg.id);
-            if (stored) { stored.text = accumText; stored.ts = stored.ts || nowTs(); saveToStorage(); }
-            renderHistoryList();
-          }
-          chatWindow.scrollTop = chatWindow.scrollHeight;
-        });
-      }
-
-      // -------------------------
-      // Event handlers & UI wiring
-      // -------------------------
-      sendBtn.addEventListener('click', async () => {
-        const txt = inputText.value.trim();
-        if (!txt) return;
-        inputText.value = '';
-        await generateReply(txt);
-      });
-
-      inputText.addEventListener('keydown', async (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          sendBtn.click();
-        }
-      });
-
-      // Temp slider update
-      tempSlider.addEventListener('input', () => {
-        const v = parseFloat(tempSlider.value);
-        state.config.temperature = v;
-        tempVal.textContent = v.toFixed(1);
-        saveToStorage();
-      });
-
-      // Persona update
-      personaSelect.addEventListener('change', () => {
-        state.config.persona = personaSelect.value;
-        saveToStorage();
-      });
-
-      // Private mode
-      privateModeCheckbox.addEventListener('change', () => {
-        state.config.privateMode = privateModeCheckbox.checked;
-        if (state.config.privateMode) {
-          // clear persisted storage if enabling private mode
-          localStorage.removeItem(LS_KEYS.HISTORY);
-          localStorage.removeItem(LS_KEYS.CONFIG);
-        } else {
-          saveToStorage();
-        }
-      });
-
-      // Export (TXT/MD)
-      exportBtn.addEventListener('click', () => {
-        const lines = state.history.map(h => {
-          const who = h.role === 'user' ? 'Você' : 'EnzoIA';
-          const ts = formatTs(h.ts);
-          return `### ${who} — ${ts}\n\n${h.text}\n`;
-        }).join('\n\n---\n\n');
-        const blob = new Blob([lines], { type: 'text/markdown' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `conversa_enzoia_${new Date().toISOString().slice(0,19)}.md`; a.click();
-      });
-
-      // Clear chat (local UI & storage)
-      clearBtn.addEventListener('click', () => {
-        if (!confirm('Limpar toda a conversa localmente?')) return;
-        state.history = [];
-        saveToStorage();
-        renderChat();
-        renderHistoryList();
-      });
-
-      // Delete history
-      deleteHistory.addEventListener('click', () => {
-        if (!confirm('Remover histórico salvo?')) return;
-        state.history = [];
-        localStorage.removeItem(LS_KEYS.HISTORY);
-        renderChat();
-        renderHistoryList();
-      });
-
-      // Load example message
-      loadExample.addEventListener('click', async () => {
-        const sample = 'Pesquisar: Quem foi Dom Pedro I?';
-        inputText.value = sample;
-        sendBtn.click();
-      });
-
-      // Configure keys (prompts user to paste keys into localStorage)
-      btnKeys.addEventListener('click', () => {
-        const open = prompt('Cole sua OpenAI API Key (deixe em branco para não configurar):', localStorage.getItem(LS_KEYS.OPENAI_KEY) || '');
-        if (open !== null) {
-          if (open.trim()) localStorage.setItem(LS_KEYS.OPENAI_KEY, open.trim());
-          else localStorage.removeItem(LS_KEYS.OPENAI_KEY);
-        }
-        const serp = prompt('Cole sua SerpAPI key (para buscas):', localStorage.getItem(LS_KEYS.SERP_KEY) || '');
-        if (serp !== null) {
-          if (serp.trim()) localStorage.setItem(LS_KEYS.SERP_KEY, serp.trim());
-          else localStorage.removeItem(LS_KEYS.SERP_KEY);
-        }
-        updateIntegrationStatus();
-      });
-
-      // Microphone (Web Speech API) - optional & progressive
-      let recognition = null;
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new Rec();
-        recognition.lang = 'pt-BR';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-        recognition.onresult = (e) => {
-          const t = e.results[0][0].transcript;
-          inputText.value = t;
-          sendBtn.click();
-        };
-        recognition.onend = () => { micBtn.textContent = '🎤'; };
-      } else {
-        micBtn.title = 'Reconhecimento de voz não suportado neste navegador';
-      }
-
-      micBtn.addEventListener('click', () => {
-        if (!recognition) { alert('Reconhecimento de voz não disponível'); return; }
-        try { recognition.start(); micBtn.textContent = '🎧 ouvindo...'; } catch(e){ console.warn(e); }
-      });
-
-      // Theme toggle (simple dark/light)
-      themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('light');
-        state.config.theme = document.body.classList.contains('light') ? 'light' : 'dark';
-        saveToStorage();
-      });
-
-      // Update integration status labels
-      function updateIntegrationStatus() {
-        openAIStatus.textContent = localStorage.getItem(LS_KEYS.OPENAI_KEY) ? 'OpenAI: Configurada' : 'OpenAI: Não configurada';
-        serpStatus.textContent = localStorage.getItem(LS_KEYS.SERP_KEY) ? 'SERPAPI: Configurada' : 'SERPAPI: Não configurada';
-      }
-
-      updateIntegrationStatus();
-
-      // Render stored data on load
-      loadFromStorage();
-      renderChat();
-      renderHistoryList();
-
-      // Save periodically (if not private)
-      setInterval(() => {
-        if (!state.config.privateMode) saveToStorage();
-      }, 5000);
-
-      // Accessibility: announce welcome
-      pushMessage('assistant', 'Olá! Eu sou o EnzoIA v3.0 — sua assistente local. Digite uma pergunta ou pressione "Exemplo" para testar.');
-
-      // -------------------------
-      // Future expansion points (comments)
-      // -------------------------
-      /* Future planned features (TODO):
-         - File upload handling (PDF, imagem, áudio) -> uploadToVectorStore(file) + extractText/embeddings
-         - RAG pipeline: queryVectorDB(query) -> retrieve documents -> callOpenAIWithContext
-         - Admin panel: auth-protected dashboard, usage metrics, feedback aggregation
-         - Fine-tuning pipeline: createFineTuneJob(dataset) via backend
-         - Multi-user support: user accounts, sessions, server-side storage (avoid localStorage for multi-user)
-         - Secure key management: server-side proxy to call OpenAI/SERP, store keys encrypted
-         - WebRTC voice streaming for low-latency audio responses
-      */
-
-      // Expose some functions for debugging in console (optional)
-      window.enzo = {
-        state, pushMessage, generateReply, callOpenAI, callSerpAPI, offlineFallback
-      };
-
-    })();
-
-    // -------------------------
-    // Small helper to load saved config on page load
-    // -------------------------
-    function loadFromStorage() {
-      try{
-        // Keep this minimal: page-level load will be done by module above
-        const cfg = localStorage.getItem('enzoia_config_v3');
-        if (cfg) {
-          const parsed = JSON.parse(cfg);
-          if (parsed.temperature) document.getElementById('tempVal').textContent = parsed.temperature;
-        }
-      } catch(e){}
+    // Funções de utilidade
+    function escapeHtml(t){return t.replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));}
+    function appendMessage(text,who="bot"){
+      const msg=document.createElement("div");
+      msg.className="msg "+(who==="user"?"user":"bot");
+      msg.innerHTML=`<div class="meta">${who==="user"?"Você":"Enzo.AI"}</div><div class="body">${text}</div>`;
+      chatEl.appendChild(msg);
+      chatEl.scrollTop=chatEl.scrollHeight;
+      if(who==="bot") speak(msg.innerText);
     }
-    loadFromStorage();
+
+    // Voz
+    function speak(text){if(!("speechSynthesis" in window))return;const u=new SpeechSynthesisUtterance(text);u.lang="pt-BR";window.speechSynthesis.speak(u);}
+    const Rec = window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(Rec){const rec=new Rec();rec.lang="pt-BR";rec.onresult=e=>{input.value=e.results[0][0].transcript;send.click();};voiceBtn.onclick=()=>{rec.start();voiceBtn.textContent="🎧";setTimeout(()=>voiceBtn.textContent="🎙",2500);};}
+
+    // Função para buscar no Google via SerpAPI
+    async function serpSearch(q){
+      if(!SERPAPI_KEY || SERPAPI_KEY.includes("Coloque")) throw new Error("SerpAPI key ausente.");
+      const params=new URLSearchParams({q,engine:"google",api_key:SERPAPI_KEY,hl:"pt",gl:"br"});
+      const res=await fetch(`https://serpapi.com/search.json?${params}`);
+      return await res.json();
+    }
+
+    // Função para respostas com OpenAI
+    async function openaiChat(prompt){
+      if(!OPENAI_API_KEY || OPENAI_API_KEY.includes("Coloque")) throw new Error("OpenAI key ausente.");
+      const body={model:"gpt-3.5-turbo",messages:[{role:"user",content:prompt}],max_tokens:500};
+      const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+OPENAI_API_KEY},body:JSON.stringify(body)});
+      const j=await r.json();
+      return j.choices[0].message.content;
+    }
+
+    // Lógica principal
+    async function handleUserMessage(txt){
+      appendMessage(escapeHtml(txt),"user");
+      const typing=showTyping();
+      try{
+        let reply;
+        if(/pesquis/i.test(txt)){
+          const query=txt.replace(/pesquis[ae]?:?/i,"").trim();
+          const data=await serpSearch(query);
+          reply=data.organic_results?.[0]?.snippet||"Não encontrei resultados.";
+        }else{
+          reply=await openaiChat(txt);
+        }
+        typing.remove();appendMessage(escapeHtml(reply).replace(/\n/g,"<br>"),"bot");
+      }catch(e){typing.remove();appendMessage("Erro ao responder: "+e.message,"bot");}
+    }
+
+    function showTyping(){
+      const el=document.createElement("div");
+      el.className="msg bot";
+      el.innerHTML='<div class="meta">Enzo.AI</div><div class="body"><span class="typing">●●●</span></div>';
+      chatEl.appendChild(el);
+      chatEl.scrollTop=chatEl.scrollHeight;
+      return el;
+    }
+
+    // Ações
+    send.onclick=()=>{if(!input.value.trim())return;handleUserMessage(input.value.trim());input.value="";};
+    input.onkeydown=e=>{if(e.key==="Enter"){send.click();}};
+    clearBtn.onclick=()=>{chatEl.innerHTML="";appendMessage("Histórico limpo.","bot");};
+    exportBtn.onclick=()=>{const text=[...chatEl.querySelectorAll(".msg")].map(m=>m.innerText).join("\n\n");const blob=new Blob([text],{type:"text/plain"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="conversa_enzoai.txt";a.click();};
+    themeBtn.onclick=()=>{document.body.classList.toggle("light");};
+
+    appendMessage("Olá! Eu sou o Enzo.AI. Digite ou fale algo para começar.","bot");
   </script>
-
-  <!--
-    Security & Privacy notes (visible to users):
-    - Nenhum dado é enviado para OpenAI ou SERPAPI a menos que você cole uma chave nas configurações.
-    - Recomenda-se usar um backend seguro (proxy) em produção para guardar chaves.
-    - Modo privado evita salvar histórico no localStorage.
-  -->
-
-  <!-- EnzoIA v3.0 | Developed by Luiz Gustavo Nascimento | 2025 -->
 </body>
 </html>
