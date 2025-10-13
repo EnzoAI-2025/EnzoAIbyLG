@@ -4,209 +4,69 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Enzo.AI — Agente de Busca</title>
-  
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
   <style>
-    /* DEFINIÇÕES DE CORES E VARIÁVEIS CSS */
     :root {
       --bg: #0b1220;
       --card: #141b2e;
       --muted: #94a3b8;
       --glass: rgba(255, 255, 255, 0.05);
-      
-      /* Cores do Gradiente (Ciano para Roxo/Magenta) - Estilo IA */
-      --grad-start: #00d9ff; 
+      --grad-start: #00d9ff;
       --grad-end: #a855f7;
       --grad: linear-gradient(45deg, var(--grad-start), var(--grad-end));
       --text-color: #e6eef6;
-      --shadow-color: rgba(168, 85, 247, 0.4); /* Sombra Roxo/Neon */
+      --shadow-color: rgba(168, 85, 247, 0.4);
     }
-
-    /* Reset e Fonte */
     *{box-sizing:border-box;font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    
-    /* Corpo e Fundo */
     body{
-      margin:0;
-      background:linear-gradient(180deg,var(--bg) 0%,#041421 100%);
-      color:var(--text-color);
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      transition:background .3s ease,color .3s ease;
+      margin:0;background:linear-gradient(180deg,var(--bg) 0%,#041421 100%);
+      color:var(--text-color);min-height:100vh;display:flex;align-items:center;justify-content:center;
+      padding:24px;transition:background .3s ease,color .3s ease;
     }
-
-    /* Tema Claro (Simples, sem o visual futurista) */
-    body.light{
-      background:linear-gradient(180deg,#f0f4f8 0%,#d9e2ec 100%);
-      color:#1e293b;
-      --card: #fff;
-      --glass: rgba(0,0,0,0.05);
-      --muted: #475569;
-    }
-    
-    /* Container Principal */
-    .app{
-      width:100%;
-      max-width:940px;
-      background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
-      border-radius:14px;
-      padding:18px;
-      box-shadow:0 10px 30px rgba(2,6,23,0.6);
-      backdrop-filter: blur(5px);
-    }
-    
-    /* Cabeçalho */
+    body.light{background:linear-gradient(180deg,#f0f4f8 0%,#d9e2ec 100%);color:#1e293b;--card:#fff;--glass:rgba(0,0,0,0.05);--muted:#475569;}
+    .app{width:100%;max-width:940px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
+      border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.6);backdrop-filter:blur(5px);}
     header{display:flex;gap:12px;align-items:center}
-    .logo{
-      width:80px;height:80px;border-radius:12px;
-      display:flex;align-items:center;justify-content:center;
-      font-weight:700;font-size:22px;color:#fff;
-      letter-spacing:-1px;
-      text-shadow:0 0 12px var(--shadow-color);
-      box-shadow:0 0 15px rgba(16,185,129,0.15); /* Mantenha uma sombra sutil */
-      overflow:hidden;
-      background: var(--grad); /* Fundo com o gradiente da IA */
-    }
-    .logo img{width:100%;height:100%;object-fit:cover}
-    
+    .logo{width:80px;height:80px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:22px;color:#fff;letter-spacing:-1px;text-shadow:0 0 12px var(--shadow-color);
+      box-shadow:0 0 15px rgba(16,185,129,0.15);overflow:hidden;background:var(--grad);}
     h1{margin:0;font-size:20px}
     p.lead{margin:4px 0 12px;color:var(--muted);font-size:13px}
-    
-    /* Janela de Chat */
-    .chat{
-      background:var(--card);
-      border-radius:12px;
-      padding:14px;
-      min-height:320px;
-      max-height:60vh;
-      overflow-y:auto;
-      display: flex; /* Flex para garantir que as mensagens se organizem */
-      flex-direction: column;
-    }
-    body.light .chat{background:#fff}
-    
-    /* Estilização das Mensagens */
-    .msg{
-      padding:10px 12px;
-      margin-bottom:8px;
-      border-radius:10px;
-      max-width:78%;
-      line-height: 1.5;
-    }
-    
-    /* Mensagem do Usuário */
-    .user{
-      background:var(--glass);
-      border: 1px solid rgba(255,255,255,0.08);
-      margin-left:auto;
-      border-top-right-radius:2px;
-    }
-    
-    /* Mensagem do Bot (Com efeito de brilho e cor de IA) */
-    .bot{
-      background:var(--card);
-      border: 1px solid var(--shadow-color); /* Borda colorida */
-      box-shadow: 0 0 10px var(--shadow-color); /* Efeito de brilho */
-      border-top-left-radius:2px;
-    }
-    
+    .chat{background:var(--card);border-radius:12px;padding:14px;min-height:320px;max-height:60vh;overflow-y:auto;display:flex;flex-direction:column;}
+    .msg{padding:10px 12px;margin-bottom:8px;border-radius:10px;max-width:78%;line-height:1.5;}
+    .user{background:var(--glass);border:1px solid rgba(255,255,255,0.08);margin-left:auto;border-top-right-radius:2px;}
+    .bot{background:var(--card);border:1px solid var(--shadow-color);box-shadow:0 0 10px var(--shadow-color);border-top-left-radius:2px;}
     .meta{font-size:11px;color:var(--muted);margin-bottom:6px}
-    .result-source {
-      font-size: 11px;
-      color: var(--grad-start); /* Destaque para a fonte */
-      margin-top: 6px;
-      opacity: 0.8;
-      display: block;
-    }
-    
-    /* Controles e Input */
+    .result-source{font-size:11px;color:var(--grad-start);margin-top:6px;opacity:0.8;display:block;}
     .controls{display:flex;gap:8px;margin-top:12px}
-    input[type=text]{
-      flex:1;padding:12px;border-radius:10px;
-      border:1px solid rgba(255,255,255,0.15);
-      background:transparent;
-      color:inherit;
-      transition: border-color .2s ease;
-    }
-    input[type=text]:focus {
-      outline: none;
-      border-color: var(--grad-end);
-    }
-    button{
-      padding:10px 14px;border-radius:10px;border:0;
-      background:var(--grad-end); /* Botões com cor de IA (Roxo) */
-      color:#072018;font-weight:600;
-      cursor:pointer;transition:opacity .2s ease, transform .1s ease;
-    }
-    button:hover{opacity:0.9; transform: translateY(-1px);}
-    
-    /* Chips de Sugestão */
+    input[type=text]{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);
+      background:transparent;color:inherit;transition:border-color .2s ease;}
+    input[type=text]:focus{outline:none;border-color:var(--grad-end);}
+    button{padding:10px 14px;border-radius:10px;border:0;background:var(--grad-end);color:#072018;font-weight:600;
+      cursor:pointer;transition:opacity .2s ease,transform .1s ease;}
+    button:hover{opacity:0.9;transform:translateY(-1px);}
     .suggestions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-    .chip{
-      background:rgba(255,255,255,0.05);
-      padding:6px 10px;
-      border-radius:999px;
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,0.02);
-      font-size: 13px;
-      transition: background .2s ease;
-    }
-    .chip:hover {
-      background:rgba(255,255,255,0.1);
-    }
-    
-    /* Rodapé */
+    .chip{background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:999px;cursor:pointer;
+      border:1px solid rgba(255,255,255,0.02);font-size:13px;transition:background .2s ease;}
+    .chip:hover{background:rgba(255,255,255,0.1);}
     footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
     .small{font-size:12px;color:var(--muted)}
-    .actions button{
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.08);
-      color:var(--muted);
-      padding:6px 10px;
-      border-radius:8px;
-    }
-    .actions button:hover {
-      background:rgba(255,255,255,0.05);
-      opacity: 1;
-    }
-    
-    /* ANIMAÇÃO DE DIGITAÇÃO (GPT/GEMINI STYLE) */
-    .typing {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      height: 12px;
-    }
-    .typing span {
-      display: block;
-      width: 6px;
-      height: 6px;
-      background: var(--grad-start); /* Cor Ciano/Brilhante */
-      border-radius: 50%;
-      animation: pulse 1.4s infinite ease-in-out both;
-    }
-    .typing span:nth-child(1) { animation-delay: -0.32s; }
-    .typing span:nth-child(2) { animation-delay: -0.16s; }
-    .typing span:nth-child(3) { animation-delay: 0s; }
-
-    @keyframes pulse {
-      0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
-      40% { transform: scale(1); opacity: 1; }
-    }
-
-    @media (max-width:820px){.app{padding:12px}.logo{width:60px;height:60px}}
+    .actions button{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--muted);
+      padding:6px 10px;border-radius:8px;}
+    .actions button:hover{background:rgba(255,255,255,0.05);}
+    .typing{display:flex;gap:4px;align-items:center;height:12px;}
+    .typing span{display:block;width:6px;height:6px;background:var(--grad-start);border-radius:50%;
+      animation:pulse 1.4s infinite ease-in-out both;}
+    .typing span:nth-child(1){animation-delay:-0.32s;}
+    .typing span:nth-child(2){animation-delay:-0.16s;}
+    .typing span:nth-child(3){animation-delay:0s;}
+    @keyframes pulse{0%,80%,100%{transform:scale(0);opacity:0.5;}40%{transform:scale(1);opacity:1;}}
   </style>
 </head>
 <body>
-  <main class="app" role="main">
+  <main class="app">
     <header>
-      <div class="logo" id="logoWrap">
-        E.IA 
-      </div>
+      <div class="logo">E.IA</div>
       <div style="flex:1">
         <h1>Enzo.AI — Agente de Busca</h1>
         <p class="lead">Pesquisador avançado na web com resultados instantâneos.</p>
@@ -214,7 +74,7 @@
       <button id="theme">Tema</button>
     </header>
 
-    <section class="chat" id="chat" aria-live="polite"></section>
+    <section class="chat" id="chat"></section>
 
     <div class="suggestions" id="sugs">
       <div class="chip">O que é a Torre Eiffel?</div>
@@ -230,19 +90,12 @@
     </div>
 
     <footer>
-      <div class="small">Enzo.AI — Powered by SerpAPI (Google Search)</div>
+      <div class="small">Enzo.AI — Powered by SerpAPI (via Proxy Local)</div>
       <div class="actions"><button id="clear">Limpar</button></div>
     </footer>
   </main>
 
   <script>
-    // ====================================================================
-    // 🔑 CONFIGURAÇÃO DA SUA CHAVE SERPAPI (COLOQUE AQUI)
-    // ====================================================================
-    const SERPAPI_KEY = "be4069ca0b6afb5540ed7748139954b772ba156715f8f90bd4b01ea30a35852e";
-    // ====================================================================
-
-    // Elementos principais
     const chatEl = document.getElementById("chat");
     const input = document.getElementById("input");
     const send = document.getElementById("send");
@@ -251,134 +104,69 @@
     const themeBtn = document.getElementById("theme");
     const sugsEl = document.getElementById("sugs");
 
-    // Funções de utilidade
-    function escapeHtml(t) { return t.replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[m])); }
-    
-    function appendMessage(text, who = "bot", source = "") {
-      const msg = document.createElement("div");
-      msg.className = "msg " + (who === "user" ? "user" : "bot");
-      
-      let bodyContent = escapeHtml(text);
-
-      // Adiciona o link de fonte apenas para respostas do BOT
-      if (who === "bot" && source) {
-          bodyContent += `<a href="${source.link}" target="_blank" class="result-source">Fonte: ${source.title || source.link}</a>`;
-      }
-      
-      msg.innerHTML = `<div class="meta">${who === "user" ? "Você" : "Enzo.AI"}</div><div class="body">${bodyContent}</div>`;
-      chatEl.appendChild(msg);
-      chatEl.scrollTop = chatEl.scrollHeight;
+    function escapeHtml(t){return t.replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));}
+    function appendMessage(text,who="bot",source=""){
+      const msg=document.createElement("div");
+      msg.className="msg "+(who==="user"?"user":"bot");
+      let bodyContent=escapeHtml(text);
+      if(who==="bot"&&source){bodyContent+=`<a href="${source.link}" target="_blank" class="result-source">Fonte: ${source.title||source.link}</a>`;}
+      msg.innerHTML=`<div class="meta">${who==="user"?"Você":"Enzo.AI"}</div><div class="body">${bodyContent}</div>`;
+      chatEl.appendChild(msg);chatEl.scrollTop=chatEl.scrollHeight;
     }
 
-    // Função Principal para Buscar no Google via SerpAPI
-    async function serpSearch(q) {
-      if (!SERPAPI_KEY || SERPAPI_KEY.includes("Insira")) throw new Error("SerpAPI key ausente ou inválida.");
-      
-      // Monta os parâmetros da busca
-      const params = new URLSearchParams({
-          q,
-          engine: "google",
-          api_key: SERPAPI_KEY,
-          hl: "pt",
-          gl: "br"
+    async function serpSearch(q){
+      const res=await fetch("http://localhost:3000/search",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({q})
       });
-      
-      const res = await fetch(`https://serpapi.com/search.json?${params}`);
-      const data = await res.json();
-      
-      let reply = { text: "Não encontrei um resultado de destaque para esta busca.", source: null };
-
-      // 1. Tenta extrair a resposta do Knowledge Graph (Painel de Conhecimento)
-      if (data.knowledge_graph) {
-          reply.text = data.knowledge_graph.description || data.knowledge_graph.title;
-          reply.source = {
-              title: data.knowledge_graph.source?.title || "Painel de Conhecimento Google",
-              link: data.knowledge_graph.source?.link || "https://google.com"
-          };
-      } 
-      // 2. Tenta extrair o Featured Snippet (Resposta em Destaque)
-      else if (data.answer_box?.snippet) {
-          reply.text = data.answer_box.snippet;
-          reply.source = {
-              title: data.answer_box.source?.title || "Resposta em Destaque",
-              link: data.answer_box.source?.link || data.answer_box.link
-          };
+      const data=await res.json();
+      let reply={text:"Não encontrei um resultado relevante.",source:null};
+      if(data.knowledge_graph){
+        reply.text=data.knowledge_graph.description||data.knowledge_graph.title;
+        reply.source={title:data.knowledge_graph.source?.title||"Painel Google",link:data.knowledge_graph.source?.link||"https://google.com"};
+      }else if(data.answer_box?.snippet){
+        reply.text=data.answer_box.snippet;
+        reply.source={title:data.answer_box.source?.title||"Resposta em Destaque",link:data.answer_box.source?.link||data.answer_box.link};
+      }else if(data.organic_results?.length>0){
+        const r=data.organic_results[0];
+        reply.text=`Encontrei isto: ${r.snippet}`;reply.source={title:r.title,link:r.link};
       }
-      // 3. Tenta extrair o primeiro resultado orgânico
-      else if (data.organic_results && data.organic_results.length > 0) {
-          const firstResult = data.organic_results[0];
-          reply.text = `Encontrei o seguinte resumo: ${firstResult.snippet}`;
-          reply.source = {
-              title: firstResult.title,
-              link: firstResult.link
-          };
-      }
-      
       return reply;
     }
 
-    // Lógica principal
-    async function handleUserMessage(txt) {
-      input.value = ""; 
-      
-      if (!txt.trim()) {
-          appendMessage("Por favor, digite um termo de busca para eu pesquisar. 🧐", "bot");
-          return;
-      }
-
-      appendMessage(txt, "user");
-      const typing = showTyping();
-
-      try {
-        // Toda entrada é uma busca
-        const result = await serpSearch(txt);
-        
-        typing.remove();
-        // A resposta agora inclui o texto e a fonte
-        appendMessage(result.text, "bot", result.source);
-        
-      } catch (e) {
-        typing.remove();
-        const errorMsg = "Ops! O Agente de Busca teve um erro. 🐛 O problema é: " + e.message + ". Verifique sua chave da SerpAPI!";
-        appendMessage(errorMsg, "bot");
+    async function handleUserMessage(txt){
+      input.value="";
+      if(!txt.trim())return appendMessage("Digite algo para pesquisar 🧐","bot");
+      appendMessage(txt,"user");
+      const typing=showTyping();
+      try{
+        const result=await serpSearch(txt);
+        typing.remove();appendMessage(result.text,"bot",result.source);
+      }catch(e){
+        typing.remove();appendMessage("Erro ao buscar: "+e.message,"bot");
       }
     }
 
-    // Animação de digitação (mantida)
-    function showTyping() {
-      const el = document.createElement("div");
-      el.className = "msg bot";
-      el.innerHTML = '<div class="meta">Enzo.AI</div><div class="body"><div class="typing"><span></span><span></span><span></span></div></div>';
-      chatEl.appendChild(el);
-      chatEl.scrollTop = chatEl.scrollHeight;
-      return el;
+    function showTyping(){
+      const el=document.createElement("div");
+      el.className="msg bot";
+      el.innerHTML='<div class="meta">Enzo.AI</div><div class="body"><div class="typing"><span></span><span></span><span></span></div></div>';
+      chatEl.appendChild(el);chatEl.scrollTop=chatEl.scrollHeight;return el;
     }
 
-    // Ações dos botões e chips
-    send.onclick = () => { if (!input.value.trim()) return; handleUserMessage(input.value.trim()); };
-    input.onkeydown = e => { if (e.key === "Enter") { send.click(); } };
-    clearBtn.onclick = () => { chatEl.innerHTML = ""; appendMessage("Histórico limpo. Pronto para a próxima busca! 🔍","bot"); };
-    themeBtn.onclick = () => { document.body.classList.toggle("light"); themeBtn.textContent = document.body.classList.contains("light") ? "Escuro" : "Tema"; };
-    
-    sugsEl.querySelectorAll(".chip").forEach(chip => {
-        chip.onclick = () => {
-            input.value = chip.textContent;
-            send.click();
-        }
-    });
-
-    exportBtn.onclick = () => {
-        const text = [...chatEl.querySelectorAll(".msg")].map(m => m.innerText).join("\n\n");
-        const blob = new Blob([text], { type: "text/plain" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "conversa_enzoai.txt";
-        a.click();
+    send.onclick=()=>{if(!input.value.trim())return;handleUserMessage(input.value.trim());};
+    input.onkeydown=e=>{if(e.key==="Enter")send.click();};
+    clearBtn.onclick=()=>{chatEl.innerHTML="";appendMessage("Histórico limpo! 🔍","bot");};
+    themeBtn.onclick=()=>{document.body.classList.toggle("light");themeBtn.textContent=document.body.classList.contains("light")?"Escuro":"Tema";};
+    sugsEl.querySelectorAll(".chip").forEach(chip=>{chip.onclick=()=>{input.value=chip.textContent;send.click();};});
+    exportBtn.onclick=()=>{
+      const text=[...chatEl.querySelectorAll(".msg")].map(m=>m.innerText).join("\n\n");
+      const blob=new Blob([text],{type:"text/plain"});
+      const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="conversa_enzoai.txt";a.click();
     };
 
-    // Mensagem de Boas-vindas (Ajustada para a Persona de Agente de Busca)
-    const WELCOME_MSG = 'Olá! 👋 Eu sou o Enzo.AI, seu agente de busca ultra-rápido. Não sou bom em piadas, mas sou **excelente** em encontrar informações no Google. 🔎 Digite o que você quer pesquisar!';
-    appendMessage(WELCOME_MSG, "bot");
+    appendMessage("Olá 👋 Eu sou o Enzo.AI, seu agente de busca! Pergunte algo e eu encontro pra você. 🔎","bot");
   </script>
 </body>
 </html>
