@@ -1,0 +1,31 @@
+// ============================================================
+// 🌐 Servidor Proxy para Enzo.AI (corrige erro de CORS)
+// ============================================================
+import express from "express";
+import fetch from "node-fetch";
+import cors from "cors";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// 🔑 SUA CHAVE SERPAPI
+const SERPAPI_KEY = "be4069ca0b6afb5540ed7748139954b772ba156715f8f90bd4b01ea30a35852e";
+
+// Endpoint para buscar na SerpAPI
+app.post("/search", async (req, res) => {
+  const { q } = req.body;
+  if (!q) return res.status(400).json({ error: "Falta o parâmetro de busca (q)" });
+
+  try {
+    const url = `https://serpapi.com/search.json?q=${encodeURIComponent(q)}&engine=google&hl=pt&gl=br&api_key=${SERPAPI_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao consultar a SerpAPI", details: err.message });
+  }
+});
+
+// Inicia o servidor
+app.listen(3000, () => console.log("🚀 Servidor rodando em http://localhost:3000"));
